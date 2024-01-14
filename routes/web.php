@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\ExportController;
 use Illuminate\Support\Facades\Route;
 
 use App\Http\Controllers\CategoryController;
@@ -60,7 +59,7 @@ Route::middleware(['auth', 'user-access:admin'])->group(function () {
     Route::put('/admin/product/update/{id}', [ProductController::class, 'update'])->name('admin.product.update');
     Route::post('/admin/product/destroy/{id}', [ProductController::class, 'destroy'])->name('admin.product.destroy');
 
-    Route::get('/export/excel', [ExportController::class, 'exportToExcel'])->name('export.excel');
+    Route::get('/admin/product/exportData', [ProductController::class, 'exportData'])->name('admin.product.exportData');
 });
 
 

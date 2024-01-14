@@ -168,4 +168,10 @@ class ProductController extends Controller
 
         return redirect()->back()->with('success', 'Product deleted successfully.');
     }
+
+    public function exportData()
+    {
+        $products = Product::with('category')->get();
+        return response()->json($products);
+    }
 }

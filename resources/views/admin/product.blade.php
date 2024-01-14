@@ -106,7 +106,7 @@
                                     <th>Categories</th>
                                     <th>Date</th>
                                     <th>Status</th>
-                                    <th style="width: 10%">Action</th>
+                                    <th style="width: 10%" class="text-center">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -147,7 +147,9 @@
                                                         <i class="fa fa-times"></i>
                                                     </button>
                                                 </form>
-                                                <button id="export-btn"><i class="fa fa-file-excel"></i></button>
+                                                <button id="export-btn" class="btn btn-link btn-success btn-lg"
+                                                    data-original-title="Export Data"><i
+                                                        class="fa fa-file-excel"></i></button>
                                             </div>
                                         </td>
                                     </tr>
@@ -237,21 +239,46 @@
     </div>
     <script>
         document.getElementById('export-btn').addEventListener('click', function() {
-            // Ambil data dari tabel atau sumber data lainnya
-            var data = [
-                ['name', 'description', 'price', 'image', 'category', 'status', 'create_at'],
-                // ... (isi data dari iterasi produk)
-            ];
+            // Lakukan permintaan AJAX untuk mendapatkan data dari server Laravel
+            var xhr = new XMLHttpRequest();
+            xhr.onreadystatechange = function() {
+                if (xhr.readyState == 4 && xhr.status == 200) {
+                    var responseData = JSON.parse(xhr.responseText);
 
-            // Konversi data menjadi sheet
-            var ws = XLSX.utils.aoa_to_sheet(data);
+                    // Inisialisasi data untuk disertakan dalam file Excel
+                    var data = [
+                        ['Name', 'Description', 'Price', 'Image', 'Category', 'Created At', 'Status']
+                    ];
 
-            // Buat workbook
-            var wb = XLSX.utils.book_new();
-            XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+                    // Iterasi melalui setiap produk dan tambahkan data ke array
+                    responseData.forEach(function(product) {
+                        var rowData = [
+                            product.name,
+                            product.description,
+                            product.price,
+                            product.image,
+                            product.category ? product.category.nama :
+                            '', // Memastikan nama kategori tersedia
+                            product.created_at,
+                            product.status
+                        ];
+                        data.push(rowData);
+                    });
 
-            // Simpan workbook ke file Excel
-            XLSX.writeFile(wb, 'products.xlsx');
+                    // Konversi data menjadi sheet
+                    var ws = XLSX.utils.aoa_to_sheet(data);
+
+                    // Buat workbook
+                    var wb = XLSX.utils.book_new();
+                    XLSX.utils.book_append_sheet(wb, ws, 'Sheet1');
+
+                    // Simpan workbook ke file Excel
+                    XLSX.writeFile(wb, 'products.xlsx');
+                }
+            };
+
+            xhr.open('GET', '{{ route('admin.product.exportData') }}', true);
+            xhr.send();
         });
     </script>
 @endsection
